@@ -1,0 +1,30 @@
+---
+title: "Week 03 - Homework Assignment"
+format: html
+self-contained: true
+editor: visual
+---
+
+# Project data
+
+Working with data is most effective when it is data that you are interested in yourself. Designing a research study is beyond the scope of this course, but maybe you already have data available that you want to analyse. Otherwise, there is plenty of data available online that you could use for a data analysis project.
+
+Some examples of popular and extensive Open Data repositories are:
+
+-   openwashdata R data packages: <https://openwashdata.org/pages/gallery/data/>
+-   World Bank Open Data: <https://data.worldbank.org/>
+-   The Humanitarian Data Exchange: <https://data.humdata.org/>
+-   Harvard Dataverse: <https://dataverse.harvard.edu/>
+
+# Task 1: Identify data
+
+1.  Identify data that you are interested in. The requirements are:
+
+-   small (around 10 to 20 variables/columns and max 10'000 to 100'000 rows/observations)
+-   in tabular format (ideally CSV file format, but XLSX is also okay)
+-   relevant to the wider topics of Global Engineering, Development, etc.
+
+2.  Describe why you have chosen this data. We will create a repository for your data in another week.
+
+<!--# Delete this comment and add your answer here  -->
+
