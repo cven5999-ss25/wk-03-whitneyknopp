@@ -1,6 +1,9 @@
 ---
 title: "Homework Exercise - Data Visualisation"
+author: "Whitney Knopp"
+date: "06/19/25"
 format: html
+toc: TRUE
 self-contained: true
 execute:
   echo: true
@@ -22,7 +25,7 @@ editor_options:
 library(gapminder)
 library(ggplot2)
 library(dplyr)
-# library(sf)
+library(sf)
 # library(rnaturalearth)
 ```
 
@@ -134,6 +137,39 @@ gapminder_summary_continent_year <- read_rds(here::here("data/gapminder-summary-
 
 4.  Run the code contained in the code chunk and fix any errors
 
+I was interested in the difference between removing and not displaying the outliers. After a bit of reading, I found the simple option to not visually display outliers built into the `geom_boxplot` geom in `ggplot` with `outlier.shape = NA`. The argument `outlier.shape = NA` uses the "Tukey" method, which is the same as the IQR method I describe below. The primary difference between my approach and the example is that `outlier.shape = NA` just visually hides the points, it does not remove them from the data set. By comparison, I filtered and created a new data.frame where the outliers were removed (<https://ggplot2.tidyverse.org/reference/geom_boxplot.html>).
+
+I decided to use the interquartile method for removing outliers because this is what we use in my research group data analysis. It works by taking setting upper and lower bounds based on the interquartile range (IQR)(between Q1 and Q1). The upper and lower bounds are `1.5*IQR` greater than Q3 and less than Q1, respectively (<https://online.stat.psu.edu/stat200/lesson/3/3.2>).
+
+```{r gapminder boxplot}
+
+# use IQR method for outlier detection
+#calculate Q1 and Q3 and the IQR
+q1 <- quantile(gapminder_yr_2007$lifeExp, 0.25)
+q3 <- quantile(gapminder_yr_2007$lifeExp, 0.75)
+iqr <- q3 - q1
+
+# calculate the upper and lower bounds
+upper_bound <- q3 + 1.5 * iqr
+lower_bound <- q1 - 1.5 * iqr
+
+# subset the data to remove outliers
+gapminder_2007_cleaned <- gapminder_yr_2007 |> 
+  subset(gapminder_yr_2007$lifeExp < upper_bound) |> 
+  subset(gapminder_yr_2007$lifeExp > lower_bound)
+
+# plot the cleaned data
+ggplot(data = gapminder_2007_cleaned, 
+       mapping = aes(x = continent,
+                         y = lifeExp,
+                         fill = continent)) +
+  geom_boxplot() +
+  labs(title = "Life Expectancy by Continent, 2007",
+         subtitle = "Data retrieved from Gapminder",
+         x = "Continent",
+         y = "Life Expectancy (years)")
+```
+
 ```{r}
 ggplot(data = gapminder_yr_2007,
        mapping = aes(x = continent,
@@ -143,6 +179,12 @@ ggplot(data = gapminder_yr_2007,
 ```
 
 5.  What are the data types of the three variables used for aesthetic mappings?
+
+    `x = continent`, the data type is categorical and unordered, the appropriate scale is discrete
+
+    `y = lifeExp`, the life expectancy variable, is continuous, this requires a continuous scale
+
+    `fill = continent`, is also an unordered categorical variable, as it is in `x = continent`, also needing a discrete scale.
 
 ## Timeseries plot
 
@@ -155,6 +197,21 @@ ggplot(data = gapminder_yr_2007,
 -   continent to color using the `color = continent` argument inside `aes()`
 
 3.  Run the code contained in the code chunk and fix any errors
+
+    ```{r timeseries}
+    ggplot(data = gapminder_summary_continent_year,
+           mapping = aes(x = year,
+                         y = lifeExp,
+                         color = continent)) + 
+      geom_line() + 
+      geom_point() + 
+      labs(title = "Change in Life Expectancy 1952 to 2007",
+             subtitle = "Data retrieved from Gapminder",
+             x = "Year",
+             y = "Life Expectancy (years)")
+
+
+    ```
 
 ```{r}
 ggplot(data = gapminder_summary_continent_year,
@@ -178,6 +235,20 @@ ggplot(data = gapminder_summary_continent_year,
 
 3.  Run the code contained in the code chunk and fix any errors
 
+    ```{r barplot geom_col}
+
+    ggplot(data = gapminder_summary_continent_2007,
+           mapping = aes(x = continent,
+                         y = count,
+                         fill = continent)) +
+      geom_col(show.legend = FALSE) +
+      labs(title = "Countries Per Continent",
+             subtitle = "Data retrieved from Gapminder",
+             x = "Continent",
+             y = "Number")
+
+    ```
+
 ```{r}
 ggplot(data = gapminder_summary_continent_2007,
        mapping = aes(x = continent,
@@ -195,13 +266,26 @@ ggplot(data = gapminder_summary_continent_2007,
 
 3.  Run the code contained in the code chunk and fix any errors
 
+    ```{r barplot geom_bar}
+
+    ggplot(data = gapminder_yr_2007,
+           mapping = aes(x = continent,
+                         fill = continent)) +
+      geom_bar(show.legend = FALSE) +
+      labs(title = "Countries Per Continent",
+             subtitle = "Data retrieved from Gapminder",
+             x = "Continent",
+             y = "Number")
+      
+    ```
+
 ```{r}
 ggplot(data = gapminder_yr_2007,
        mapping = aes(x = continent)) +
   geom_bar()
 ```
 
-4.  The plot is identical to the plot created with `geom_col()`. Why? What does the `geom_bar()` function do? Write your text here:
+4.  The plot is identical to the plot created with `geom_col()`. Why? What does the `geom_bar()` function do? Write your text here: The function `geom_bar()` makes the height of the bar proportional to the number in each group, therefore it doesn't need a y value. It counts the number of occurrences of each category in continent. In `geom_col()` the bar heights represent a value associated with each category. That is why x and y aesthetics mapping is required, it plots value (number/count) fir each category (continent) (retrieved from R documentation `??geom_bar` ).
 
 ## Histogram
 
@@ -221,6 +305,20 @@ ggplot(data = gapminder_yr_2007,
 
 5.  Run the code contained in the code chunk and fix any errors
 
+    ```{r histogram}
+
+    ggplot(data = gapminder_yr_2007,
+           mapping = aes(x = lifeExp,
+                         fill = continent)) +
+      geom_histogram(col = "grey30",
+                    breaks = seq(40, 80, 2.5)) +
+      labs(title = "Distribution of Life Expenctancy",
+             subtitle = "Data retrieved from Gapminder",
+             x = "Life Expectancy (years)",
+             y = "Count")
+      
+    ```
+
 ```{r}
 ggplot(data = gapminder_yr_2007,
        mapping = aes(x = lifeExp, 
@@ -230,7 +328,11 @@ ggplot(data = gapminder_yr_2007,
 
 6.  Describe how the `geom_histogram()` function is similar to the `geom_bar()` function.
 
+    The `geom_histogram()` function is similar to the `geom_bar()` function because is counts the frequency of a value over a range (life expectancy). It only requires a single aesthetic to map, x. The y axis is always the count/frequency of a number appearing in the given bins of the histogram.
+
 7.  What happens by adding the 'breaks' argument? Play around with the numbers inside of `seq()` to see what changes. Describe what you observe here:
+
+    The 'breaks' argument in the `geom_histogram()` function changes the bins of the histogram. It can change the range of values and the size of the bins. In the `seq()` function, the first number (40) is the lower bound/starting value, the second number (80) is the upper bound/ending value, and the third number (2.5) is the breaks that create the bins. Changing the third argument in `seq()` changes the bin size, larger numbers make less bins and impacts the count in each bin.
 
 ## Scatterplot and faceting
 
@@ -249,6 +351,8 @@ ggplot(data = gapminder_yr_2007,
 
 5.  Describe in your own words what the `facet_wrap()` function does
 
+    The function `facet_wrap()` breaks the single chart into individual plots based on the argument. In this case it creates separate plots for each continent.
+
 6.  Adapt the scaling of the size by adding `scale_size(range = c(2, 12))` on the next line
 
 7.  Run the code contained in the code chunk and fix any errors
@@ -256,6 +360,19 @@ ggplot(data = gapminder_yr_2007,
 8.  Adapt the scaling of the x-axis to log10 by adding `scale_x_log10(labels = scales::label_log(), limits = c(100, 100000))` on the next line
 
 9.  Run the code contained in the code chunk and fix any errors
+
+    ```{r scatterplot}
+    ggplot(data = gapminder_yr_2007,
+           mapping = aes(x = gdpPercap,
+                         y = lifeExp,
+                         size = pop,
+                         color = continent)) +
+      geom_point() + 
+      facet_wrap(~continent) + 
+      scale_size(range = c(2, 12)) + 
+      scale_x_log10(labels = scales::label_log(), limits = c(100, 100000))
+
+    ```
 
 ```{r}
 ggplot(data = gapminder_yr_2007,
@@ -279,6 +396,8 @@ ggplot(data = gapminder_yr_2007,
 
 4.  What is stored in the `country_colors` object? Find out by executing the object in the Console (type it to the Console and hit enter). Do the same again, but with a question mark `?country_colors`
 
+    The `country_colors` object stores a color for every country with a hex color code. Using the R documentation with `?country_colors`, it shows that there is a color stored for 142 countries and also one for each continent.
+
 5.  Render the document and fix any errors
 
 ```{r}
@@ -289,7 +408,7 @@ ggplot(data = gapminder,
                      color = country)) +
   geom_line(lwd = 1, show.legend = FALSE) + 
   facet_wrap(~continent) +
-  # scale_color_manual(values = country_colors) +
+  scale_color_manual(values = country_colors) +
   theme_minimal()
 ```
 
@@ -305,21 +424,23 @@ The code chunk below contains code for a world map that shows countries by incom
 
 3.  Render the document and fix any errors
 
+    I have commented out this section since I am getting errors and I want the document to be able to render.
+
 ```{r}
 # First, load the required packages at the top of the document:
 # library(sf)
 # library(rnaturalearth)
 
-world <- ne_countries(scale = "small", returnclass = "sf")
+# world <- ne_countries(scale = "small", returnclass = "sf")
 
-world |> 
-  mutate(income_grp = factor(income_grp, ordered = T)) |> 
-  ggplot() + 
-  geom_sf(aes(fill = income_grp)) +
-  theme_void() +
-  theme(legend.position = "top") +
-  labs(fill = "Income Group:") +
-  guides(fill = guide_legend(nrow = 2, byrow = TRUE))
+# world |> 
+  # mutate(income_grp = factor(income_grp, ordered = T)) |> 
+  # ggplot() + 
+  # geom_sf(aes(fill = income_grp)) +
+  # theme_void() +
+  # theme(legend.position = "top") +
+  # labs(fill = "Income Group:") +
+  # guides(fill = guide_legend(nrow = 2, byrow = TRUE))
 ```
 
 The code for the code chunk is taken from here: More here: https://bookdown.org/alhdzsz/data_viz_ir/maps.html
