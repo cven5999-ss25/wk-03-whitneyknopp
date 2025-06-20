@@ -26,5 +26,13 @@ Some examples of popular and extensive Open Data repositories are:
 
 2.  Describe why you have chosen this data. We will create a repository for your data in another week.
 
-<!--# Delete this comment and add your answer here  -->
+One of the biggest passions I have and a motivator for my PhD research is WASH access, specifically in East Africa. For this project, I am interested in using a global data set for emergency WASH, as I predominantly work in the development space, but these areas increasingly overlap in the face of conflict and climate change. I have chosen a global data set on emergency WASH access from UNHCR. The data includes indicators on water, sanitation and hygiene access during or post emergency, disaggregated by location/country. I hope to perform data analysis and visualization on this data, combined with information on global minimum standards for WASH in emergencies, from the Sphere handbook to understand areas that meet minimum standards and others that require greater investment/support.
 
+The data itself is part of `devtools` package and the library is `unhcrwash`, which can be accessed directly in R or downloaded as a csv/xlsx file.
+
+```{r}
+library(unhcrwash)
+
+emergency_wash <- unhcrwash
+
+```
