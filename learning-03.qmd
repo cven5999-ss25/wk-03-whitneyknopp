@@ -12,15 +12,13 @@ Learning reflections are part of your weekly homework and have a weight of 20% o
 
 # Lecture
 
-<!--# Add your reflections on the lecture of this week here -->
+I still find it challenging to determine when the mapping aesthetics for data should go in the original `ggplot` function following the `data =` entry or in the geom argument. While I understand putting the aesthetics in the first `ggplot` function applies it to all the following geoms, I get confused when it comes to filling/coloring with a third set of data. This is something I am glad I had the change to practice in the homework and will continue to experiment with and work on.
 
 # Homework Assignment
 
-<!--# Add your reflections on the homework programming assignment here -->
+I think it is so powerful the impact that `geoms` have in `ggplot`. There are so many differnt kinds of plots that are possible to render and nearly unlimited layers to modify the appearance and presentation of data. One of my goals both in this class and throughout the course of my PhD is to learn the most effective ways to displace large amounts of interesting and valuable data on a single figure. In the scatter/line plot section of the homework, being able to facet graphs, include information regarding a country's continent, size, and life expectancy and display in one figure is very efficient and academically sophisticated. This is something I want to work on and achieve in my capstone project for this class.
 
 # Readings
-
-<!--# Add your reflections on the required readings here -->
 
 # Submit learning reflections
 
